@@ -1,0 +1,41 @@
+.row
+  .col-md-2
+  .col-md-8
+    .panel.panel-default
+      .panel-heading
+        %h4 Welcome
+      .panel-body
+        %p 
+          .btn.btn-default.btn-block#host Host A New Game
+          #new-game.well{style: 'display:none;'}
+            %form.form-horizontal
+              %fieldset
+                %legend Create A Game
+                .control-group
+                  %label.control-label{for: "username"} Username:
+                  .controls
+                    %input#username.input-xlarge.form-control{name: "username", placeholder: "e.g., Thor", type: "text"}/
+                .control-group
+                  %label.control-label{for: "group_id"} Group ID:
+                  .controls
+                    %input#group_id.input-xlarge.form-control{name: "group_id", type: "text", readonly: true, value: SecureRandom.urlsafe_base64(3, false).upcase}/
+                    %p.help-block Don't worry, this will be visible in game.
+              %br/
+              = submit_tag 'Create Game', name: nil, class: 'btn btn-default btn-block'
+        %p
+          .btn.btn-default.btn-block#join Join A Game In Progress
+          #in-progress.well{style: 'display:none;'}
+            %form.form-horizontal
+              %fieldset
+                %legend Join A Game
+                .control-group
+                  %label.control-label{for: "username"} Username:
+                  .controls
+                    %input#username.input-xlarge.form-control{name: "username", placeholder: "e.g., Thor", type: "text"}/
+                .control-group
+                  %label.control-label{for: "group_id"} Group ID:
+                  .controls
+                    %input#group_id.input-xlarge.form-control{name: "group_id", placeholder: "e.g., T3XJ", type: "text"}/
+                    %p.help-block Enter the Game ID provided by the people you are playing with.
+              %br/
+              = submit_tag 'Join Game', name: nil, class: 'btn btn-default btn-block'
