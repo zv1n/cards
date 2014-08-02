@@ -1,0 +1,17 @@
+.navbar-header
+  %button.navbar-toggle{"data-target" => ".navbar-collapse", "data-toggle" => "collapse", :type => "button"}
+    %span.sr-only Toggle navigation
+    %span.icon-bar
+    %span.icon-bar
+    %span.icon-bar
+  %a.navbar-brand{:href => "/"} 
+    Cards Against Humanity
+/ - if logged_in?
+/   .navbar-collapse.collapse
+/     %ul.nav.navbar-nav
+/       %li
+/         = link_to('Places', places_path)
+/   %ul.nav.navbar-nav.navbar-right
+/     %li
+/       = link_to('ROOT', root_path)
+/ /.navbar-collapse
