@@ -1,0 +1,22 @@
+{
+  "current_games": {
+    "KSDI": {
+      "owner": "Thor",
+      "players": {
+        "Thord": {
+          "wins": [],
+          "hand": [],
+          "selection": 0
+        }
+      },
+      "cards": {
+        "active": [],
+        "played": [],
+        "round": {
+          "picker": 0,
+          "picking": 0,
+        }
+      }
+    }
+  }
+}
