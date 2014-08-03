@@ -10,7 +10,7 @@
         %p 
           .btn.btn-default.btn-block#host Host A New Game
           #new-game.well{style: 'display:none;'}
-            %form.form-horizontal{ date: { action: 'create' } }
+            %form.form-horizontal{ data: { action: 'create' } }
               %fieldset
                 %legend Create A Game
                 .control-group
@@ -27,7 +27,7 @@
         %p
           .btn.btn-default.btn-block#join Join A Game In Progress
           #in-progress.well{style: 'display:none;'}
-            %form.form-horizontal{ date: { action: 'join' } }
+            %form.form-horizontal{ data: { action: 'join' } }
               %fieldset
                 %legend Join A Game
                 .control-group

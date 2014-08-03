@@ -1,0 +1,45 @@
+body {
+  background-color: #777;
+}
+
+#game-div {
+
+  .board {
+    // border: 1px solid #888;
+    // -webkit-border-radius: 3px;
+    // -moz-border-radius: 3px;
+    // border-radius: 3px;
+
+    // background-color: #AAA;
+    // padding: 15px;
+
+    // height: 350px;
+
+    .card {
+      float: left;
+      display: inline-block;
+      margin: 10px;
+
+      width: 150px;
+      height: 200px;
+      padding: 10px;
+      cursor: pointer;
+
+      -webkit-border-radius: 8px;
+      -moz-border-radius: 8px;
+      border-radius: 8px;
+
+      &.white {
+        border: 1px solid #888;
+        color: black;
+        background-color: white;
+      }
+
+      &.black {
+        border: 1px solid #888;
+        color: white;
+        background-color: black;
+      }
+    }
+  }
+}

@@ -16,28 +16,30 @@
 
   configure_create = ->
     $('form').submit (event) ->
+      event.preventDefault()
       $form = $(event.currentTarget)
 
       user = $form.find('#username').val()
       game = $form.find('#game_id').val()
 
       unless user.length > 0
-        event.preventDefault()
         alert("Please enter a username.")
         return false
 
       unless game.length > 0
-        event.preventDefault()
         alert("Please enter a Game ID.")
         return false
 
       game_instance = new CardsGame(user)
 
       switch $form.data('action')
-        when 'create' then game_instance.create(game)
-        when 'join' then game_instance.join(game)
+        when 'create'
+          console.log('Running create...')
+          game_instance.create(game)
+        when 'join'
+          console.log('Running join...')
+          game_instance.join(game)
 
-      event.preventDefault()
       return false
 
   $(document).on 'page:load', configure_init

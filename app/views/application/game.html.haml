@@ -1,2 +1,15 @@
 :javascript
   window.firebase = "#{ENV['FIREBASE_ENDPOINT']}"
+
+#game-div
+  .board
+    .card.black
+      .user
+        %em='{{picker}}'
+      ='{{}}'
+    ='{{#each card}}'
+    .card.white='{{this}}'
+    = '{{/each}}'
+
+%script#card-template{ type: 'text/x-handlebars-template' }
+  
