@@ -30,15 +30,15 @@
         alert("Please enter a Game ID.")
         return false
 
-      game_instance = new CardsGame(user)
+      game_instance = new CardsGame(user, game)
 
       switch $form.data('action')
         when 'create'
           console.log('Running create...')
-          game_instance.create(game)
+          game_instance.create()
         when 'join'
           console.log('Running join...')
-          game_instance.join(game)
+          game_instance.join()
 
       return false
 

@@ -1,13 +1,6 @@
 .navbar-header
-  %button.navbar-toggle{"data-target" => ".navbar-collapse", "data-toggle" => "collapse", :type => "button"}
-    %span.sr-only Toggle navigation
-    %span.icon-bar
-    %span.icon-bar
-    %span.icon-bar
-  %a.navbar-brand{:href => "/"} 
-    Cards Against Humanity
-  %p.nav.navbar-nav.pull-right
-    %br/
+  %a.navbar-brand{:href => "/"}
+    CAHumanity
     %span#game-id
 / - if logged_in?
 /   .navbar-collapse.collapse

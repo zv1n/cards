@@ -2,44 +2,111 @@ body {
   background-color: #777;
 }
 
-#game-div {
+.content {
+  .content-panel {
+    margin-top: 10px;
+  }
+}
 
-  .board {
-    // border: 1px solid #888;
-    // -webkit-border-radius: 3px;
-    // -moz-border-radius: 3px;
-    // border-radius: 3px;
+.card-board {
+  .card {
+    float: left;
+    display: inline-block;
+    margin: 10px;
+    margin-bottom: 0px;
 
-    // background-color: #AAA;
-    // padding: 15px;
+    width: 146px;
+    height: 200px;
+    padding: 10px;
+    cursor: pointer;
 
-    // height: 350px;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
 
-    .card {
-      float: left;
-      display: inline-block;
-      margin: 10px;
+    .user, .score {
+      font-size: 12px;
+    }
 
-      width: 150px;
-      height: 200px;
-      padding: 10px;
-      cursor: pointer;
+    .user {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+    }
 
-      -webkit-border-radius: 8px;
-      -moz-border-radius: 8px;
-      border-radius: 8px;
+    &.white {
+      position: relative;
+      border: 1px solid #888;
+      color: black;
+      background-color: white;
 
-      &.white {
-        border: 1px solid #888;
-        color: black;
-        background-color: white;
+      &.selected {
+        background-color: lightgrey;
+        border-color: grey;
+
+        .btn {
+          display: block;
+          position: absolute;
+          bottom: 10px;
+          width: 123px;
+          margin-left: 0px;
+
+          -webkit-border-radius: 5px;
+          -moz-border-radius: 5px;
+          border-radius: 5px;
+        }
       }
 
-      &.black {
-        border: 1px solid #888;
-        color: white;
+      .btn {
+        display: none;
+      }
+    }
+
+    &.player {
+      border: 1px solid #888;
+      color: black;
+      background-color: #EEE;
+
+      height: 70px;
+
+      &.picker {
         background-color: black;
+        color: white;
       }
+
+      &.self {
+        background-color: lightblue;
+      }
+
+      .kick {
+        float: right;
+        padding: 2px;
+        padding-top: 1px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    &.place {
+      border: 3px solid darkred;
+      background-color: transparent;
+    }
+
+    &.black {
+      &.top {
+        padding: 8px;
+        padding-left: 20px;
+        display: block;
+        width: 95%;
+        height: auto;
+      }
+
+      position: relative;
+      width: 170px;
+      height: 230px;
+      border: 1px solid #888;
+      color: white;
+      background-color: black;
     }
   }
 }

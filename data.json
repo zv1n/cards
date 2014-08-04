@@ -4,18 +4,19 @@
       "owner": "Thor",
       "players": {
         "Thord": {
-          "wins": [],
-          "hand": [],
-          "selection": 0
+          "wins": {},
+          "hand": {},
+          "selection": 0,
+          "order": 0
         }
       },
       "cards": {
-        "active": [],
-        "played": [],
-        "round": {
-          "picker": 0,
-          "picking": 0,
-        }
+        "won": {},
+        "discarded": {}
+      },
+      "round": {
+        "picker": 0,
+        "picking": 0
       }
     }
   }

@@ -1,15 +1,72 @@
 :javascript
   window.firebase = "#{ENV['FIREBASE_ENDPOINT']}"
 
-#game-div
-  .board
+#game-content
+  %ul.nav.nav-tabs{ role: 'tablist' }
+    %li.active
+      %a{ data: { toggle: 'tab' }, href: '#board', role: 'tab' } Game Table
+    %li
+      %a{ data: { toggle: 'tab' }, href: '#hand', role: 'tab' } My Hand
+    %li
+      %a{ data: { toggle: 'tab' }, href: '#users', role: 'tab' } Players
+
+  .tab-content.card-board
+    #board.tab-pane.active
+    #hand.tab-pane
+    #users.tab-pane
+
+  %script#board-template{ type: 'text/x-handlebars-template' }
     .card.black
+      = '{{picking}}'
       .user
-        %em='{{picker}}'
-      ='{{}}'
-    ='{{#each card}}'
+        %em='{{name}}'
+    = '{{#each card}}'
     .card.white='{{this}}'
     = '{{/each}}'
+    = '{{#each places}}'
+    .card.place
+    = '{{/each}}'
 
-%script#card-template{ type: 'text/x-handlebars-template' }
-  
+  %script#hand-template{ type: 'text/x-handlebars-template' }
+    .card.black.top
+      = '{{picking}}'
+    .hand
+      = '{{#each cards}}'
+      .card.white
+        = '{{this}}'
+        .btn.btn-default.btn-sm Use This Card
+      = '{{/each}}'
+
+  %script#users-template{ type: 'text/x-handlebars-template' }
+    = '{{#each users}}'
+    = '{{#if this.picker}}'
+    .card.player.picker
+      = '{{@key}}'
+      = '{{#if this.owner}}'
+      .kick.btn.btn-default x
+      = '{{/if}}'
+      .score Points: {{this.points}}
+      .score Order: {{this.order}}
+    = '{{else}}'
+    = '{{#if this.self}}'
+    .card.player.self
+      = '{{@key}}'
+      = '{{#if this.picker}}'
+      (Picker)
+      = '{{/if}}'
+      = '{{#if this.owner}}'
+      .kick.btn.btn-default x
+      = '{{/if}}'
+      .score Points: {{this.points}}
+      .score Order: {{this.order}}
+    = '{{else}}'
+    .card.player
+      = '{{@key}}'
+      = '{{#if this.owner}}'
+      .kick.btn.btn-default x
+      = '{{/if}}'
+      .score Points: {{this.points}}
+      .score Order: {{this.order}}
+    = '{{/if}}'
+    = '{{/if}}'
+    = '{{/each}}'
