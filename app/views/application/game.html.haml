@@ -21,7 +21,11 @@
       .user
         %em='{{name}}'
     = '{{#each card}}'
+    = '{{#if show_cards}}'
     .card.white='{{this}}'
+    = '{{else}}'
+    .card.white
+    = '{{/if}}'
     = '{{/each}}'
     = '{{#each places}}'
     .card.place

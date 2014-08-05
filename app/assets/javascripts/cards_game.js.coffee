@@ -88,7 +88,8 @@ class window.CardsGame
     $('#board').html(@board_template({
       name: @game.round.picker,
       picking: @hand.picking,
-      places: @game.places
+      places: @game.places,
+      show_cards: @game.places.length > 0
     }))
 
     @hand.update()
