@@ -2,7 +2,7 @@ class window.Hand
 
   constructor: (@fire, @white) ->
     @player = {}
-    @picking = 'Loading...'
+    @selection = 'Loading...'
 
     _this = this
 
@@ -21,6 +21,15 @@ class window.Hand
           _this.player.hand = {}
         _this.update()
 
+  set_black_card: (sel) ->
+    _this = this
+    @selection = sel
+
+    if $('#black-card').html() != @selection
+      $('#black-card').fadeOut(->
+        $('#black-card').html(_this.selection).fadeIn()
+      )
+
   draw: ->
     draw = @white.draw()
     @player.hand[draw.key] = draw.card
@@ -29,6 +38,7 @@ class window.Hand
   configure_card_sel: ->
     $('.hand .card').click (event) ->
       $target = $(event.currentTarget)
+      return if $target.hasClass('disabled')
       $('.hand .card').removeClass('selected')
       $target.addClass('selected')
 
@@ -52,10 +62,18 @@ class window.Hand
     @update_render()
 
   update_render: ->
-    $('#hand').html(@hand_template({
+    _this = this
+
+    $('#hand-content').html(@hand_template({
       cards: @player.hand,
-      picking: @picking
+      picking: @selection,
+      picker: @picker
     }))
+
+    $('.use-me').click (event) ->
+      $target = $(event.currentTarget)
+      card = $target.data('card')
+      _this.fire.user.update({ picking: card })
 
     @configure_card_sel()
 

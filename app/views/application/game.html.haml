@@ -13,64 +13,42 @@
   .tab-content.card-board
     #board.tab-pane.active
     #hand.tab-pane
+      .you-are-picker.prehidden You are currently the picker.
+      .card.black.top
+        #black-card
+      #hand-content
     #users.tab-pane
 
   %script#board-template{ type: 'text/x-handlebars-template' }
     .card.black
-      = '{{picking}}'
+      {{selection}}
       .user
-        %em='{{name}}'
-    = '{{#each card}}'
-    = '{{#if show_cards}}'
-    .card.white='{{this}}'
-    = '{{else}}'
+        %em {{name}}
+    {{#each card}}
+    {{#if show_cards}}
+    .card.white {{this}}
+    {{else}}
     .card.white
-    = '{{/if}}'
-    = '{{/each}}'
-    = '{{#each places}}'
+    {{/if}}
+    {{/each}}
+    {{#each places}}
     .card.place
-    = '{{/each}}'
+    {{/each}}
 
   %script#hand-template{ type: 'text/x-handlebars-template' }
-    .card.black.top
-      = '{{picking}}'
     .hand
-      = '{{#each cards}}'
-      .card.white
-        = '{{this}}'
-        .btn.btn-default.btn-sm Use This Card
-      = '{{/each}}'
+      {{#each cards}}
+      %div{ class: 'card white {{#if ../picker}}disabled{{/if}}' }
+        {{this}}
+        .btn.btn-default.btn-sm.use-me{ data: { card: '{{@key}}' } } Use This Card
+      {{/each}}
 
   %script#users-template{ type: 'text/x-handlebars-template' }
-    = '{{#each users}}'
-    = '{{#if this.picker}}'
-    .card.player.picker
-      = '{{@key}}'
-      = '{{#if this.owner}}'
-      .kick.btn.btn-default x
-      = '{{/if}}'
-      .score Points: {{this.points}}
-      .score Order: {{this.order}}
-    = '{{else}}'
-    = '{{#if this.self}}'
-    .card.player.self
-      = '{{@key}}'
-      = '{{#if this.picker}}'
-      (Picker)
-      = '{{/if}}'
-      = '{{#if this.owner}}'
-      .kick.btn.btn-default x
-      = '{{/if}}'
-      .score Points: {{this.points}}
-      .score Order: {{this.order}}
-    = '{{else}}'
-    .card.player
-      = '{{@key}}'
-      = '{{#if this.owner}}'
-      .kick.btn.btn-default x
-      = '{{/if}}'
-      .score Points: {{this.points}}
-      .score Order: {{this.order}}
-    = '{{/if}}'
-    = '{{/if}}'
-    = '{{/each}}'
+    .prehidden.card.player{ id: '{{user}}' }
+      {{user}}
+      .btn.btn-default.kick.prehidden{ data: { user: '{{user}}' } } x
+      .score
+        Points:
+        %span#points {{points}}
+      .score Order: {{order}}
+

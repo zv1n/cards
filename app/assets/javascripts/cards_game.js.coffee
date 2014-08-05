@@ -21,7 +21,7 @@ class window.CardsGame
     @game_listener()
 
   is_picker: (name) ->
-    name == @game.round.picker
+    name == @game.picker
 
   is_self: (name) ->
     name == @user
@@ -38,24 +38,49 @@ class window.CardsGame
   update_players: ->
     info = @game.players
 
-    for f of info
-      info[f].points = @points_for_player(info[f])
-      info[f].picker = @is_picker(f)
-      info[f].self = @is_self(f)
-      info[f].owner = @is_owner(f)
+    if @is_picker(@user)
+      $('.you-are-picker').slideDown()
+    else
+      $('.you-are-picker').slideUp()
 
-    $('#users').html(
-      @users_template({
-        users: info
-      })
-    )
+    for f of info
+      info[f].user = f
+
+    for f of info
+      user_list = $('#users')
+      user = $("##{f}")
+
+      if user.length == 0
+        user = $(@users_template(info[f]))
+        user_list.append(user)
+        user.fadeIn()
+        @kick_action(user) if @is_owner(@user)
+
+      user.find('.kick').removeClass('prehidden') if @is_owner(@user)
+      user.find('#points').text(@points_for_player(info[f]))
+
+      if @is_picker(f)
+        user.addClass('picker')
+      else
+        user.removeClass('picker')
+
+      if @is_self(f)
+        user.addClass('self')
+      else
+        user.removeClass('self')
+
+    user_list = $('#users ')
 
     @hand.update()
+
+  kick_action: (target) ->
+    target.click (event) ->
+      console.log('TODO: $(event.currentTarget)')
 
   update_places: ->
     @game.places = []
     for f of @game.players
-      continue if @game.players[f].picked || f == @game.round.picker
+      continue if @game.players[f].picked || f == @game.picker
       @game.places.push f
 
   update_cards: ->
@@ -71,22 +96,27 @@ class window.CardsGame
     for f of @game.cards.won
       @black.remove_card(f)
 
-    @black.remove_card(@game.round.picking)
+    @black.remove_card(@game.players[@game.picker].picking)
 
     console.log("White Cards Left: #{@white.cards_remaining()} of #{@white.cards_total()}")
     console.log("Black Cards Left: #{@black.cards_remaining()} of #{@black.cards_total()}")
 
   update_round: ->
-    @picker = @game.players[@game.round.picker]
+    @picker = @game.players[@game.picker]
     picking = @picker.picking
 
-    if @game.round.picker == @user && picking == undefined
+    if @is_picker(@user) && picking == undefined
       picking = @black.draw().key
-      @fire.user.update({ picking: picking })
+      @fire.user.update({
+        picking: picking
+      })
 
-    @hand.picking = @black.card(picking)
+    bcard = @black.card(picking)
+    @hand.set_black_card(bcard)
+    @hand.picker = @is_picker(@user)
+
     $('#board').html(@board_template({
-      name: @game.round.picker,
+      name: @game.picker,
       picking: @hand.picking,
       places: @game.places,
       show_cards: @game.places.length > 0
@@ -178,7 +208,5 @@ class window.CardsGame
         won: {},
         discarded: {}
       },
-      round: {
-        picker: @user
-      }
+      picker: @user
     })

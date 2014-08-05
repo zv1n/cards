@@ -5,12 +5,16 @@ class window.CardDeck
     @init()
 
   remove_card: (key) ->
-    @removed_cards[key] = @cards[key]
-    delete @cards[key]
+    if @cards.hasOwnProperty(key)
+      @removed_cards[key] = @cards[key]
+      delete @cards[key]
     return @removed_cards[key]
 
   card: (key) ->
-    @cards[key] || @removed_cards[key]
+    if @cards.hasOwnProperty(key)
+      return @cards[key]
+    else
+      return @removed_cards[key]
 
   cards_remaining: ->
     Object.keys(@cards).length

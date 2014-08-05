@@ -8,6 +8,33 @@ body {
   }
 }
 
+.prehidden {
+  display: none;
+}
+
+.you-are-picker {
+  &.prehidden {
+    display: none;
+  }
+
+  display: block;
+  margin: 10px;
+  margin-bottom: 0px;
+
+  width: 95%;
+
+  background-color: darkred;
+  border: 1px solid black;
+  color: white;
+  
+  padding: 10px;
+  padding-left: 20px;
+
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  border-radius: 8px;
+}
+
 .card-board {
   .card {
     float: left;
@@ -18,11 +45,15 @@ body {
     width: 146px;
     height: 200px;
     padding: 10px;
-    cursor: pointer;
+    cursor: default;
 
     -webkit-border-radius: 8px;
     -moz-border-radius: 8px;
     border-radius: 8px;
+
+    &.prehidden {
+      display: none;
+    }
 
     .user, .score {
       font-size: 12px;
@@ -39,6 +70,11 @@ body {
       border: 1px solid #888;
       color: black;
       background-color: white;
+
+      &.disabled {
+        background-color: lightgrey;
+        border-color: grey;
+      }
 
       &.selected {
         background-color: lightgrey;
@@ -67,6 +103,7 @@ body {
       color: black;
       background-color: #EEE;
 
+      width: 200px;
       height: 70px;
 
       &.picker {
@@ -76,9 +113,20 @@ body {
 
       &.self {
         background-color: lightblue;
+        color: black;
+      }
+
+      &.picker.self {
+        background-color: steelblue;
+        border-color: darkblue;
+        color: white; 
       }
 
       .kick {
+        &.prehidden {
+          display: none;
+        }
+
         float: right;
         padding: 2px;
         padding-top: 1px;
@@ -92,9 +140,22 @@ body {
       background-color: transparent;
     }
 
+    &.selected.top {
+      background-color: lightgrey;
+      border-color: grey;
+
+      color: black;
+
+      padding: 10px;
+      padding-left: 20px;
+      display: block;
+      width: 95%;
+      height: auto;
+    }
+
     &.black {
       &.top {
-        padding: 8px;
+        padding: 10px;
         padding-left: 20px;
         display: block;
         width: 95%;
