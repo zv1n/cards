@@ -3,16 +3,16 @@
 
 #game-content
   %ul.nav.nav-tabs{ role: 'tablist' }
-    %li.active
-      %a{ data: { toggle: 'tab' }, href: '#board', role: 'tab' } Game Table
     %li
+      %a{ data: { toggle: 'tab' }, href: '#board', role: 'tab' } Game Table
+    %li.active
       %a{ data: { toggle: 'tab' }, href: '#hand', role: 'tab' } My Hand
     %li
       %a{ data: { toggle: 'tab' }, href: '#users', role: 'tab' } Players
 
   .tab-content.card-board
-    #board.tab-pane.active
-    #hand.tab-pane
+    #board.tab-pane
+    #hand.tab-pane.active
       .you-are-picker.prehidden You are currently the picker.
       .card.black.top
         #black-card
@@ -38,8 +38,9 @@
   %script#hand-template{ type: 'text/x-handlebars-template' }
     .hand
       {{#each cards}}
-      %div{ class: 'card white {{#if ../picker}}disabled{{/if}}' }
-        {{this}}
+      %div{ class: 'card white {{#if ../picker}}disabled{{/if}}', id: '{{@key}}' }
+        #card-text
+          {{this}}
         .btn.btn-default.btn-sm.use-me{ data: { card: '{{@key}}' } } Use This Card
       {{/each}}
 

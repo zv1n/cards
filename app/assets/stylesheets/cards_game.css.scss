@@ -70,15 +70,18 @@ body {
       border: 1px solid #888;
       color: black;
       background-color: white;
+      cursor: pointer;
 
       &.disabled {
         background-color: lightgrey;
         border-color: grey;
+        cursor: default;
       }
 
       &.selected {
         background-color: lightgrey;
         border-color: grey;
+        cursor: default;
 
         .btn {
           display: block;

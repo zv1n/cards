@@ -8,7 +8,15 @@ class window.CardDeck
     if @cards.hasOwnProperty(key)
       @removed_cards[key] = @cards[key]
       delete @cards[key]
+
     return @removed_cards[key]
+
+  send_removal: (key, cb) ->
+    update = {}
+    update[key] = true 
+    @root.update(update, (err) ->
+      cb(err, card) if cb
+    )
 
   card: (key) ->
     if @cards.hasOwnProperty(key)
@@ -20,16 +28,11 @@ class window.CardDeck
     Object.keys(@cards).length
 
   cards_total: ->
-    Object.keys(@cards).length + Object.keys(@removed_cards).length    
+    Object.keys(@cards).length + Object.keys(@removed_cards).length
 
-  draw: ->
+  draw: (update, cb) ->
     keys = Object.keys(@cards)
     draw_key = keys[keys.length * Math.random() << 0]
-
-    update = {}
-    update[draw_key] = true 
-    @root.update(update)
-
     return { key: draw_key, card: @remove_card(draw_key) }
 
   peek: (key) ->

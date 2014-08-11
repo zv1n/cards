@@ -69,9 +69,7 @@ class window.CardsGame
       else
         user.removeClass('self')
 
-    user_list = $('#users ')
-
-    @hand.update()
+    @hand.update(info[@user])
 
   kick_action: (target) ->
     target.click (event) ->
@@ -98,31 +96,33 @@ class window.CardsGame
 
     @black.remove_card(@game.players[@game.picker].picking)
 
-    console.log("White Cards Left: #{@white.cards_remaining()} of #{@white.cards_total()}")
-    console.log("Black Cards Left: #{@black.cards_remaining()} of #{@black.cards_total()}")
+    # console.log("White Cards Left: #{@white.cards_remaining()} of #{@white.cards_total()}")
+    # console.log("Black Cards Left: #{@black.cards_remaining()} of #{@black.cards_total()}")
 
   update_round: ->
     @picker = @game.players[@game.picker]
     picking = @picker.picking
 
-    if @is_picker(@user) && picking == undefined
+    if @is_picker(@user) && picking == null
       picking = @black.draw().key
+
+      @black.send_removal(picking)
       @fire.user.update({
-        picking: picking
+        selection: picking
       })
 
     bcard = @black.card(picking)
-    @hand.set_black_card(bcard)
-    @hand.picker = @is_picker(@user)
 
     $('#board').html(@board_template({
       name: @game.picker,
-      picking: @hand.picking,
+      selection: @hand.picking,
       places: @game.places,
       show_cards: @game.places.length > 0
     }))
 
-    @hand.update()
+    @hand.set_black_card(bcard)
+    @hand.picker = @is_picker(@user)
+    @hand.update(@game.players[@user])
 
   create: ->
     console.log("Creating game: #{@game_id}")
