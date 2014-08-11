@@ -6,14 +6,18 @@ class window.CardDeck
 
   remove_card: (key) ->
     if @cards.hasOwnProperty(key)
-      @removed_cards[key] = @cards[key]
+      @removed_cards[key] = @cards[key].toString()
       delete @cards[key]
 
     return @removed_cards[key]
 
   send_removal: (key, cb) ->
     update = {}
-    update[key] = true 
+    if key instanceof Array
+      for f in key
+        update[f] = true
+    else
+      update[key] = true 
     @root.update(update, (err) ->
       cb(err, card) if cb
     )

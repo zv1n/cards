@@ -9,13 +9,14 @@ class window.CardsGame
     @black = new BlackDeck(@fire.cards)
     @white = new WhiteDeck(@fire.cards)
 
+    @players = {}
     @game = {}
 
   start: () ->
     _this = this
 
     @compile_templates()
-    @hand = new Hand(@fire, @white)
+    @hand = new Hand(@fire, @white, this)
 
     $('#game-id').text("(#{@game_id} - #{@user})")
     @game_listener()
@@ -26,60 +27,50 @@ class window.CardsGame
   is_self: (name) ->
     name == @user
 
+  is_winner: (name) ->
+    name == @game.winner
+
   is_owner: (name) ->
     @game.owner == @user
 
-  points_for_player: (player) ->
-    if player.hasOwnProperty('won')
-      return Object.keys(player.won).length
-    else
-      return 0
+  all_players_picked: ->
+    for f of @game.players
+      return false if @game.players[f].picking == 0
+
+    return true
+
+  next_picker: ->
+    picker_idx = @game.players[@game.picker].order + 1
+    picker_idx = 0 if picker_idx == @game.players.length
+
+    for f of @game.players
+      return f if @game.players[f].order == picker_idx
+
+    return Object.keys(@game.players)[0]
+
+  round_winner: (user) ->
+    @root.update({ winner: user })
+    game_update = {
+      winner: null,
+      picker: @next_picker(),
+      players: {}
+    }
+
+    for f of @game.players
+      game_update.players[f] = @game.players[f]
+      game_update.players[f].selection = 0
+
+    _this = this
+    setTimeout( ->
+      _this.root.update(game_update)
+    , 5000)
+
 
   update_players: ->
-    info = @game.players
-
-    if @is_picker(@user)
-      $('.you-are-picker').slideDown()
-    else
-      $('.you-are-picker').slideUp()
-
-    for f of info
-      info[f].user = f
-
-    for f of info
-      user_list = $('#users')
-      user = $("##{f}")
-
-      if user.length == 0
-        user = $(@users_template(info[f]))
-        user_list.append(user)
-        user.fadeIn()
-        @kick_action(user) if @is_owner(@user)
-
-      user.find('.kick').removeClass('prehidden') if @is_owner(@user)
-      user.find('#points').text(@points_for_player(info[f]))
-
-      if @is_picker(f)
-        user.addClass('picker')
-      else
-        user.removeClass('picker')
-
-      if @is_self(f)
-        user.addClass('self')
-      else
-        user.removeClass('self')
-
-    @hand.update(info[@user])
-
-  kick_action: (target) ->
-    target.click (event) ->
-      console.log('TODO: $(event.currentTarget)')
-
-  update_places: ->
-    @game.places = []
     for f of @game.players
-      continue if @game.players[f].picked || f == @game.picker
-      @game.places.push f
+      unless @players[f]
+        @players[f] = new Player(f, this)
+      @players[f].update(@game.players[f])
 
   update_cards: ->
     unless @game.cards
@@ -94,7 +85,7 @@ class window.CardsGame
     for f of @game.cards.won
       @black.remove_card(f)
 
-    @black.remove_card(@game.players[@game.picker].picking)
+    @black.remove_card(@game.players[@game.picker].selection)
 
     # console.log("White Cards Left: #{@white.cards_remaining()} of #{@white.cards_total()}")
     # console.log("Black Cards Left: #{@black.cards_remaining()} of #{@black.cards_total()}")
@@ -112,16 +103,20 @@ class window.CardsGame
       })
 
     bcard = @black.card(picking)
+    btext = $('#board #black-card-text')
+    _this = this
+    if btext.html() != bcard
+      btext.fadeOut ->
+        btext.html(bcard)
+        btext.fadeIn()
 
-    $('#board').html(@board_template({
-      name: @game.picker,
-      selection: @hand.picking,
-      places: @game.places,
-      show_cards: @game.places.length > 0
-    }))
+    picker = $('#board #picker')
+    if picker.html() != @game.picker
+      picker.fadeOut ->
+        picker.html(_this.game.picker)
+        picker.fadeIn()
 
-    @hand.set_black_card(bcard)
-    @hand.picker = @is_picker(@user)
+    @hand.set_black_card(@is_picker(@user), bcard)
     @hand.update(@game.players[@user])
 
   create: ->
@@ -176,7 +171,6 @@ class window.CardsGame
       _this.game = snapshot.val()
       _this.update_players.call(_this)
       _this.update_cards.call(_this)
-      _this.update_places.call(_this)
       _this.update_round.call(_this)
     )
 
@@ -197,7 +191,6 @@ class window.CardsGame
       wins: {},
       hand: {},
       selection: 0,
-      picker: true,
       order: 0
     }
 
