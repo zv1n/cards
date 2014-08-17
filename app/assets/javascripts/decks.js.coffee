@@ -18,12 +18,12 @@ class window.CardDeck
         update[f] = true
     else
       update[key] = true 
+    console.log(update)
     @root.update(update, (err) ->
       cb(err, card) if cb
     )
 
   card: (key) ->
-    console.log @deck
     if @cards.hasOwnProperty(key)
       return @cards[key]
     else

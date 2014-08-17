@@ -98,9 +98,9 @@ class window.CardsGame
     selection = @picker.selection
 
     console.log @is_picker(@user)
-    console.log picking
+    console.log selection
     if @is_picker(@user) && selection == 0
-      picking = @black.draw().key
+      selection = @black.draw().key
       console.log "Picking: #{selection}"
 
       @fire.user.update({
@@ -109,7 +109,6 @@ class window.CardsGame
       @black.send_removal(selection)
 
     bcard = @black.card(selection)
-    console.log bcard
     btext = $('#board #black-card-text')
     _this = this
     if btext.html() != bcard
