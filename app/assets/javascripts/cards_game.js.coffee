@@ -49,10 +49,13 @@ class window.CardsGame
     return Object.keys(@game.players)[0]
 
   round_winner: (user) ->
+    next_picker = @next_picker()
+    console.log("Next Picker: #{next_picker}")
+
     @root.update({ winner: user })
     game_update = {
       winner: null,
-      picker: @next_picker(),
+      picker: next_picker,
       players: {}
     }
 
@@ -92,17 +95,21 @@ class window.CardsGame
 
   update_round: ->
     @picker = @game.players[@game.picker]
-    picking = @picker.picking
+    selection = @picker.selection
 
-    if @is_picker(@user) && picking == null
+    console.log @is_picker(@user)
+    console.log picking
+    if @is_picker(@user) && selection == 0
       picking = @black.draw().key
+      console.log "Picking: #{selection}"
 
-      @black.send_removal(picking)
       @fire.user.update({
-        selection: picking
+        selection: selection
       })
+      @black.send_removal(selection)
 
-    bcard = @black.card(picking)
+    bcard = @black.card(selection)
+    console.log bcard
     btext = $('#board #black-card-text')
     _this = this
     if btext.html() != bcard
@@ -116,6 +123,7 @@ class window.CardsGame
         picker.html(_this.game.picker)
         picker.fadeIn()
 
+    console.log bcard
     @hand.set_black_card(@is_picker(@user), bcard)
     @hand.update(@game.players[@user])
 
@@ -145,6 +153,8 @@ class window.CardsGame
         return false
       else
         order = Object.keys(list.players).length
+        if @user in Object.keys(list.players)
+          order -= 1
 
         player_info = {}
         player_info[@user] = {

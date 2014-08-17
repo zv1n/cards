@@ -50,11 +50,11 @@ class window.Player
       $card = $("#board-content ##{@player}-card")
       $placeholder = $("#board-content ##{@player}-placeholder")
 
-    $("##{@player}-card .select-me").unbind('click').click (event) ->
+    $("##{@player}-card .select-me").click (event) ->
       $target = $(event.currentTarget)
-      $target.addClass('disabled')
 
-      $('#board-content .card.white').addClass('no-select').removeClass('selected')
+      $('#board-content .card.white').addClass('no-select')
+        .removeClass('selected').unbind('click')
 
       user = $target.data('user')
       _this.game.round_winner(user)

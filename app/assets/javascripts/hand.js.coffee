@@ -11,6 +11,7 @@ class window.Hand
 
   set_black_card: (@picker, sel) ->
     _this = this
+    console.log sel
     @black_card = sel
 
     if $('#black-card').html() != @black_card
