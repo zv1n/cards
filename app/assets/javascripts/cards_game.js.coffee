@@ -87,8 +87,12 @@ class window.CardsGame
           @fire.root.update({ game_over: true })
           return
 
+        game_update.players[f].selection = parseInt(@selection)
         @black.send_removal(@selection)
-        game_update.players[f].selection = @selection
+
+
+    console.log("Sel: #{game_update.players[next_picker].selection}")
+    console.log(game_update)
 
     _this = this
     setTimeout( ->
