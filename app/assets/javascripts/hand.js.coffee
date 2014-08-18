@@ -23,7 +23,8 @@ class window.Hand
         $('.hand .card').addClass('disabled')
       else
         $('.you-are-picker').slideUp()
-        $('.hand .card').removeClass('disabled')
+        if @player.selection == -1
+          $('.hand .card').removeClass('disabled')
 
   configure_card_sel: ->
     $('.hand .card').click (event) ->
@@ -138,7 +139,7 @@ class window.Hand
           $("##{card}").removeClass('selected')
           $target.attr('disabled', false).removeClass('disabled')
 
-          _this.fire.user.update({ selection: card })
+          _this.fire.user.update({ selection: parseInt(card) })
           _this.fire.user.child('hand').child(card).remove()
         )
 

@@ -12,12 +12,18 @@ class window.Chat
       _this.update_chat.call(_this, snapshot.val())
     )
 
+    chat_target = ($line) ->
+      _this.send_chat($line.val())
+      $line.val('')
+
     $('#chat').keypress (event) ->
       if event.which == 13
         $line = $(event.currentTarget)
-        if $line.val().length > 0
-          _this.send_chat($line.val())
-        $line.val('')
+        chat_target($line)
+
+    $('#send').click (event) ->
+      $line = $('#chat')
+      chat_target($line)
 
   update_chat: (@chat) ->
     for f of @chat
@@ -35,7 +41,8 @@ class window.Chat
         }, 0)
 
   send_chat: (line) ->
-    @fire.push({ name: @user, message: line })
+    if line.length > 0
+      @fire.push({ name: @user, message: line })
 
   game_line: (line) ->
     @fire.push({ message: line })

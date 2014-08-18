@@ -43,7 +43,7 @@
     .input-group
       = text_field_tag :chat, nil, class: 'form-control'
       .input-group-btn
-        .btn.btn-default Send
+        .btn.btn-default#send Send
 
 %script#user-msg-template{ type: 'text/x-handlebars-template' }
   %tr.user-message{ id: '{{id}}' }

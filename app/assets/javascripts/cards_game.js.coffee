@@ -214,23 +214,14 @@ class window.CardsGame
 
         return false
       else
-        player_info = {}
+        return @navigate() if @user of list.players
 
-        player_info.selection = -1 unless @user == list.picker
-
-        orders = []
-        for player in list.players
-          orders.push list.players[player].order
-
-        order = Object.keys(list.players).length
-
-        if list.players[@user]
-          # for some reason order isn't set...
-          unless 'order' of list.players[@user]
-            for ord in orders
-              console.log(ord)
-        else
-          player_info.order = order
+        player_info = {
+          hand: {},
+          won: {},
+          selection: -1, 
+          order: Object.keys(list.players).length
+        }
 
         @fire.root.child('players').child(@user).update(player_info)
         @navigate()
@@ -304,7 +295,7 @@ class window.CardsGame
     player_list[@user] = {
       wins: {},
       hand: {},
-      selection: @selection,
+      selection: parseInt(@selection),
       order: 0
     }
 
