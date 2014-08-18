@@ -87,8 +87,8 @@ class window.CardsGame
           @fire.root.update({ game_over: true })
           return
 
-        game_update.players[f].selection = @selection
         @black.send_removal(@selection)
+        game_update.players[f].selection = @selection
 
     _this = this
     setTimeout( ->
@@ -297,11 +297,14 @@ class window.CardsGame
     @users_template = Handlebars.compile(source)
 
   new_game: ->
+    @selection = @black.draw().key
+    @black.send_removal(@selection)
+
     player_list = {}
     player_list[@user] = {
       wins: {},
       hand: {},
-      selection: -1,
+      selection: @selection,
       order: 0
     }
 
