@@ -25,7 +25,10 @@ class window.Chat
       $line = $('#chat')
       chat_target($line)
 
+    @container = $('.chat-container')
+
   update_chat: (@chat) ->
+    last_id = undefined
     for f of @chat
       if $("##{f}").length == 0
         msg = @chat[f]
@@ -36,9 +39,13 @@ class window.Chat
         else
           $('#chat-box').append(@admin_message(msg))
 
-        $('.chat-container').animate({
-          scrollTop: $("##{f}").position().top
-        }, 0)
+        last_id = f
+
+    if last_id
+      chatline = $("##{last_id}")
+      @container.animate({
+        scrollTop: chatline.position().top + chatline.height() + @container.scrollTop()
+      }, 100)
 
   send_chat: (line) ->
     if line.length > 0
