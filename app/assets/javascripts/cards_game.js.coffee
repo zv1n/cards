@@ -35,6 +35,9 @@ class window.CardsGame
   is_owner: (name) ->
     @game.owner == @user
 
+  play_order: (name) ->
+    @game.players[name].order
+
   all_players_picked: ->
     for f of @game.players
       return false if @game.players[f].selection == -1
@@ -63,9 +66,16 @@ class window.CardsGame
       players: {}
     }
 
+    won_card = @game.players[@game.picker].selection
+
     for f of @game.players
       game_update.players[f] = @game.players[f]
       game_update.players[f].selection = -1
+
+      if f == user
+        unless game_update.players[f].won
+          game_update.players[f].won = {}
+        game_update.players[f].won[won_card] = @black.card(won_card)
 
       if f == next_picker
         @selection = @black.draw().key
@@ -88,6 +98,18 @@ class window.CardsGame
       unless @players[f]
         @players[f] = new Player(f, this)
       @players[f].update(@game.players[f])
+
+    removals = []
+    for p of @players
+      unless p of @game.players
+        @players[p].destroy()
+        removals.push p
+
+    for f in removals
+      delete @players[f]
+      if @user == f
+        alert('You have been kicked from this game!')
+        Turbolinks.visit('/')
 
     if @game.picker
       @black.remove_card(@game.players[@game.picker].selection)
@@ -230,6 +252,10 @@ class window.CardsGame
 
   game_listeners: ->
     _this = this
+
+    unless @user of @game.players
+      alert('You must join the game first!')
+      Turbolinks.visit('/')
 
     @update_cards()
     @update_players()

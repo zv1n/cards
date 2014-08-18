@@ -8,12 +8,19 @@ class window.Player
       return 0
 
   kick_action: (target) ->
+    _this = this
     target.click (event) ->
-      console.log('TODO: $(event.currentTarget)')
+      return unless confirm('Are you sure you want to delete this user?')
+      player = $(event.currentTarget).parent().attr('id')
+      _this.game.fire.root.child('players').child(player).remove()
 
   update: (@self) ->
     @update_players()
     @update_table()
+
+  destroy: ->
+    $("#users ##{@player}").fadeOut -> this.remove()
+    $("##{@player}-table").fadeOut -> this.remove()
 
   update_players: ->
     user_list = $('#users')
@@ -23,12 +30,13 @@ class window.Player
       user = $(@game.users_template({player: @self, user: @player}))
       user_list.append(user)
       user.fadeIn()
-      @kick_action(user) if @game.is_owner(@game.user)
+      @kick_action(user.find('.kick')) if @game.is_owner(@game.user)
 
     if @game.is_owner(@game.user)
       user.find('.kick').removeClass('prehidden')
 
     user.find('#points').text(@points_for_player(@self))
+    user.find('#order').text(@game.play_order(@player))
 
     if @game.is_picker(@player)
       user.addClass('picker')

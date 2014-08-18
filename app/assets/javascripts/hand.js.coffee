@@ -100,6 +100,8 @@ class window.Hand
     $selection.attr('id', new_card)
 
   update: (player) ->
+    return unless player
+
     player.hand ||= {}
 
     if player != @player
