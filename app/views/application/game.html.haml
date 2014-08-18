@@ -47,7 +47,10 @@
 
 %script#user-msg-template{ type: 'text/x-handlebars-template' }
   %tr.user-message{ id: '{{id}}' }
-    %td.user {{name}}
+    %td.user
+      {{name}}
+      .time
+        %time.timeago{ datetime: '{{time}}' } {{time}}
     %td.msg {{message}}
 
 %script#admin-msg-template{ type: 'text/x-handlebars-template' }

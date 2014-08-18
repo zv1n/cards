@@ -39,6 +39,8 @@ class window.Chat
         else
           $('#chat-box').append(@admin_message(msg))
 
+        $('#chat-box .timeago').timeago()
+
         last_id = f
 
     if last_id
@@ -49,7 +51,14 @@ class window.Chat
 
   send_chat: (line) ->
     if line.length > 0
-      @fire.push({ name: @user, message: line })
+      @fire.push({
+        name: @user,
+        time: (new Date()).toISOString(),
+        message: line
+      })
 
   game_line: (line) ->
-    @fire.push({ message: line })
+    @fire.push({
+      time: (new Date()).toISOString(),
+      message: line
+    })

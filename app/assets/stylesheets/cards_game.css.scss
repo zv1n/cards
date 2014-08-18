@@ -31,9 +31,13 @@ body {
           }
 
           .user {
-            width: 100px;
+            width: 125px;
             border: 1px solid black;
             color: white;
+            .time {
+              font-size: 10px;
+              color: lightgrey;
+            }
           }
         }
 
