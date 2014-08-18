@@ -17,8 +17,8 @@ class window.CardDeck
       for f in key
         update[f] = true
     else
-      update[key] = true 
-    console.log(update)
+      update[key] = true
+
     @root.update(update, (err) ->
       cb(err, card) if cb
     )

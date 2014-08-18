@@ -1,5 +1,9 @@
 body {
   background-color: #777;
+
+  li.prehidden {
+    display: none;
+  }
 }
 
 .content {

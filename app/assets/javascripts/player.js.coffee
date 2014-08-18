@@ -25,7 +25,9 @@ class window.Player
       user.fadeIn()
       @kick_action(user) if @game.is_owner(@game.user)
 
-    user.find('.kick').removeClass('prehidden') if @game.is_owner(@user)
+    if @game.is_owner(@game.user)
+      user.find('.kick').removeClass('prehidden')
+
     user.find('#points').text(@points_for_player(@self))
 
     if @game.is_picker(@player)
@@ -50,7 +52,7 @@ class window.Player
       $card = $("#board-content ##{@player}-card")
       $placeholder = $("#board-content ##{@player}-placeholder")
 
-    $("##{@player}-card .select-me").click (event) ->
+    $("##{@player}-card .select-me").unbind('click').click (event) ->
       $target = $(event.currentTarget)
 
       $('#board-content .card.white').addClass('no-select')
@@ -59,7 +61,12 @@ class window.Player
       user = $target.data('user')
       _this.game.round_winner(user)
 
-    @show_placeholder(@self.selection == 0, $card, $placeholder)
+    unless @game.displaying_winner()
+      $("##{@player}-name").fadeOut()
+      $("##{@player}-winner").fadeOut()
+      $("##{@player}-card").removeClass('disabled')
+
+    @show_placeholder(@self.selection == -1, $card, $placeholder)
     @set_card_text($card, @game.white.card(@self.selection) || '')
     @show_card_text(@game.all_players_picked(), $card)
 
@@ -69,13 +76,20 @@ class window.Player
       500)
     return
 
+  update_winner: (winner) ->
+    if @player == winner
+      $("##{@player}-winner").fadeIn()
+    else
+      $("##{@player}-card").addClass('disabled')
+
+    $('#board-content .user').fadeIn()
+
   set_card_text: (card, text) ->
     cardtext = card.find('#card-text')
 
     if cardtext.html() != text
       cardtext.fadeOut( ->
         cardtext.html(text)
-        cardtext.fadeIn()
       )
 
   show_placeholder: (show, card, placeholder) ->

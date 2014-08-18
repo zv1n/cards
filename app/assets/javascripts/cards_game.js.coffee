@@ -2,6 +2,7 @@ class window.CardsGame
   constructor: (@user, @game_id) ->
     @root = new Firebase(window.firebase).child('current_games').child(@game_id)
     @fire = {
+      root: @root,
       cards: @root.child('cards'),
       user: @root.child('players').child(@user)
     }
@@ -11,6 +12,7 @@ class window.CardsGame
 
     @players = {}
     @game = {}
+    @selection = -1
 
   start: () ->
     _this = this
@@ -19,7 +21,7 @@ class window.CardsGame
     @hand = new Hand(@fire, @white, this)
 
     $('#game-id').text("(#{@game_id} - #{@user})")
-    @game_listener()
+    @init_game()
 
   is_picker: (name) ->
     name == @game.picker
@@ -35,13 +37,13 @@ class window.CardsGame
 
   all_players_picked: ->
     for f of @game.players
-      return false if @game.players[f].picking == 0
+      return false if @game.players[f].selection == -1
 
     return true
 
   next_picker: ->
     picker_idx = @game.players[@game.picker].order + 1
-    picker_idx = 0 if picker_idx == @game.players.length
+    picker_idx = 0 if picker_idx == Object.keys(@game.players).length
 
     for f of @game.players
       return f if @game.players[f].order == picker_idx
@@ -50,9 +52,11 @@ class window.CardsGame
 
   round_winner: (user) ->
     next_picker = @next_picker()
-    console.log("Next Picker: #{next_picker}")
 
-    @root.update({ winner: user })
+    # Reset the local selection
+    @selection = -1
+
+    @fire.root.update({ winner: user })
     game_update = {
       winner: null,
       picker: next_picker,
@@ -61,7 +65,17 @@ class window.CardsGame
 
     for f of @game.players
       game_update.players[f] = @game.players[f]
-      game_update.players[f].selection = 0
+      game_update.players[f].selection = -1
+
+      if f == next_picker
+        @selection = @black.draw().key
+
+        if @selection == undefined
+          @fire.root.update({ game_over: true })
+          return
+
+        game_update.players[f].selection = @selection
+        @black.send_removal(@selection)
 
     _this = this
     setTimeout( ->
@@ -74,6 +88,9 @@ class window.CardsGame
       unless @players[f]
         @players[f] = new Player(f, this)
       @players[f].update(@game.players[f])
+
+    if @game.picker
+      @black.remove_card(@game.players[@game.picker].selection)
 
   update_cards: ->
     unless @game.cards
@@ -88,33 +105,47 @@ class window.CardsGame
     for f of @game.cards.won
       @black.remove_card(f)
 
-    @black.remove_card(@game.players[@game.picker].selection)
-
     # console.log("White Cards Left: #{@white.cards_remaining()} of #{@white.cards_total()}")
     # console.log("Black Cards Left: #{@black.cards_remaining()} of #{@black.cards_total()}")
 
-  update_round: ->
-    @picker = @game.players[@game.picker]
-    selection = @picker.selection
+  game_over: ->
+    alert('Looks like the game is over! No more black cards to select!') unless @alerted
+    @alerted = true
 
-    console.log @is_picker(@user)
-    console.log selection
-    if @is_picker(@user) && selection == 0
-      selection = @black.draw().key
-      console.log "Picking: #{selection}"
-
-      @fire.user.update({
-        selection: selection
-      })
-      @black.send_removal(selection)
-
-    bcard = @black.card(selection)
-    btext = $('#board #black-card-text')
+  host_actions: ->
     _this = this
-    if btext.html() != bcard
-      btext.fadeOut ->
-        btext.html(bcard)
-        btext.fadeIn()
+    $('#host-tab').fadeIn()
+
+    $('#reset').click ->
+      return unless confirm('Are you sure you want to reset the game?')
+      _this.fire.root.update({ game_over: false })
+      _this.fire.cards.update({ discarded: {}, won: {} })
+
+  reset_game_state: ->
+    @selection = -1
+
+  displaying_winner: ->
+    @game.winner != undefined
+
+  update_round: ->
+    return @game_over() if @game.game_over
+
+    if @displaying_winner()
+      @reset_game_state()
+      for player of @players
+        @players[player].update_winner(@game.winner)
+
+    _this = this
+
+    @update_picker()
+
+    if @selection > -1
+      bcard = @black.card(@selection)
+      btext = $('#board #black-card-text')
+      if btext.html() != bcard
+        btext.fadeOut ->
+          btext.html(bcard)
+          btext.fadeIn()
 
     picker = $('#board #picker')
     if picker.html() != @game.picker
@@ -122,9 +153,15 @@ class window.CardsGame
         picker.html(_this.game.picker)
         picker.fadeIn()
 
-    console.log bcard
     @hand.set_black_card(@is_picker(@user), bcard)
-    @hand.update(@game.players[@user])
+
+  update_picker: ->
+    return unless @game.players
+
+    @picker = @game.players[@game.picker]
+
+    if @picker.selection > -1 || !@is_picker(@user)
+      @selection = @picker.selection
 
   create: ->
     console.log("Creating game: #{@game_id}")
@@ -136,7 +173,7 @@ class window.CardsGame
         return
       else
         console.log("Creating game: #{@game_id}")
-        @init_game()
+        @new_game()
         @navigate()
 
   join: ->
@@ -151,35 +188,70 @@ class window.CardsGame
 
         return false
       else
-        order = Object.keys(list.players).length
-        if @user in Object.keys(list.players)
-          order -= 1
-
         player_info = {}
-        player_info[@user] = {
-          selection: 0,
-          order: order,
-          wins: {},
-          hand: {}
-        }
 
-        @root.child('players').update(player_info)
+        player_info.selection = -1 unless @user == list.picker
+
+        orders = []
+        for player in list.players
+          orders.push list.players[player].order
+
+        order = Object.keys(list.players).length
+
+        if list.players[@user]
+          # for some reason order isn't set...
+          unless 'order' of list.players[@user]
+            for ord in orders
+              console.log(ord)
+        else
+          player_info.order = order
+
+        @fire.root.child('players').child(@user).update(player_info)
         @navigate()
 
   game_exists: (cb) ->
     _this = this
 
-    @root.once('value', (snapshot) ->
+    @fire.root.once('value', (snapshot) ->
       cb.call(_this, snapshot.val())
     )
 
-  game_listener: ->
+  init_game: ->
     _this = this
 
-    @root.on('value', (snapshot) ->
+    @fire.root.once('value', (snapshot) ->
       _this.game = snapshot.val()
-      _this.update_players.call(_this)
+
+      if _this.is_owner(@user)
+        _this.host_actions()
+
+      _this.game_listeners.call(_this)
+    )
+
+  game_listeners: ->
+    _this = this
+
+    @update_cards()
+    @update_players()
+    @update_picker()
+    @update_round()
+
+    @fire.root.child('cards').on('value', (snapshot) ->
+      _this.game.cards = snapshot.val()
       _this.update_cards.call(_this)
+    )
+
+    @fire.root.child('players').on('value', (snapshot) ->
+      _this.game.players = snapshot.val()
+      _this.update_players.call(_this)
+    )
+
+    @fire.user.on('value', (snapshot) ->
+      _this.hand.update(snapshot.val())
+    )
+
+    @fire.root.on('value', (snapshot) ->
+      _this.game = snapshot.val()
       _this.update_round.call(_this)
     )
 
@@ -194,16 +266,16 @@ class window.CardsGame
     source = $("#users-template").html()
     @users_template = Handlebars.compile(source)
 
-  init_game: ->
+  new_game: ->
     player_list = {}
     player_list[@user] = {
       wins: {},
       hand: {},
-      selection: 0,
+      selection: -1,
       order: 0
     }
 
-    @root.set({
+    @fire.root.set({
       players: player_list,
       owner: @user,
       cards: {

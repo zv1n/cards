@@ -11,7 +11,6 @@ class window.Hand
 
   set_black_card: (@picker, sel) ->
     _this = this
-    console.log sel
     @black_card = sel
 
     if $('#black-card').html() != @black_card
@@ -19,17 +18,18 @@ class window.Hand
         $('#black-card').html(_this.black_card).fadeIn()
       )
 
-    if @picker
-      $('.you-are-picker').slideDown()
-      $('.hand .card').addClass('disabled')
-    else
-      $('.you-are-picker').slideUp()
-      $('.hand .card').removeClass('disabled')
+      if @picker
+        $('.you-are-picker').slideDown()
+        $('.hand .card').addClass('disabled')
+      else
+        $('.you-are-picker').slideUp()
+        $('.hand .card').removeClass('disabled')
 
   configure_card_sel: ->
     $('.hand .card').click (event) ->
       $target = $(event.currentTarget)
       return if $target.hasClass('disabled')
+
       $('.hand .card').removeClass('selected')
       $target.addClass('selected')
 
@@ -37,6 +37,7 @@ class window.Hand
       $('#board-content .card.white').click (event) ->
         $target = $(event.currentTarget)
         return if $target.hasClass('disabled') || $target.hasClass('no-select')
+
         $('#board-content .card.white').removeClass('selected')
         $target.addClass('selected')
     else
@@ -46,9 +47,11 @@ class window.Hand
     @player.hand
 
   populate_and_update_hand: ->
+    @player.hand = {} unless @player.hasOwnProperty('hand')
+
     if Object.keys(@player.hand).length < 7
       new_cards = []
-      for card in [Object.keys(@player.hand).length..7]
+      for card in [Object.keys(@player.hand).length..6]
         draw = @white.draw(false)
         new_cards.push draw.key
         @player.hand[draw.key] = draw.card
@@ -56,30 +59,45 @@ class window.Hand
       @fire.user.update({
         hand: @player.hand
       })
+
       @white.send_removal(new_cards)
 
-  update_hand: ->
-    _this = this
-
-    new_card = null
-    @player.hand = {} unless @player.hasOwnProperty('hand')
-
-    @populate_and_update_hand()
-
+  update_discarded: ->
     discarded = {}
     for f of @player.hand
       discarded[f] = true
 
     @fire.cards.child('discarded').update(discarded)
 
+  update_difference: ->
+    new_cards = []
+
     for f of @player.hand
       if $("##{f}").length == 0
-        new_card = f
+        new_cards.push f
 
-    if new_card
-      $selection = $("##{@player.selection}")
-      $selection.find('#card-text').html(@white.card(new_card)).fadeIn()
-      $selection.attr('id', new_card)
+    cards = $('#hand-content .card').map (ix,el) -> el.id
+    for card in cards
+      continue if card of @player.hand
+      @update_card(card, new_cards.pop())
+
+  update_hand: ->
+    _this = this
+
+    @populate_and_update_hand()
+    @update_discarded()
+
+    # Just return if there are no cards, they will be rendered correctly.
+    return if $('#hand-content .card').length == 0
+
+    @update_difference()
+
+  update_card: (selection, new_card) ->
+    _this = this
+    $selection = $("##{selection}")
+    $text = $selection.find('#card-text')
+    $text.fadeOut -> $text.html(_this.white.card(new_card)).fadeIn()
+    $selection.attr('id', new_card)
 
   update: (player) ->
     player.hand ||= {}
@@ -93,7 +111,7 @@ class window.Hand
 
     @update_render()
 
-  update_render: ->
+  update_render: (changed) ->
     _this = this
 
     if $('#hand-content .card').length != 7
@@ -104,18 +122,19 @@ class window.Hand
       }))
 
       $cards = $('#hand-content .card')
-      $cards.addClass('disabled') if @player.selection > 0 || @picker
+      $cards.addClass('disabled') if @player.selection > -1 || @picker
       $cards.slideDown().removeClass('prehidden')
 
       $('.use-me').unbind('click').click (event) ->
         $target = $(event.currentTarget)
         $target.attr('disabled', true).addClass('disabled')
-        card = $target.data('card')
+        card = $target.parent().attr('id')
+
+        $('#hand-content .card').addClass('disabled')
 
         $("##{card} #card-text").fadeOut(->
           $("##{card}").removeClass('selected')
           $target.attr('disabled', false).removeClass('disabled')
-          $('#hand-content .card').addClass('disabled')
 
           _this.fire.user.update({ selection: card })
           _this.fire.user.child('hand').child(card).remove()

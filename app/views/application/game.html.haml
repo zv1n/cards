@@ -9,6 +9,8 @@
       %a{ data: { toggle: 'tab' }, href: '#hand', role: 'tab' } My Hand
     %li
       %a{ data: { toggle: 'tab' }, href: '#users', role: 'tab' } Players
+    %li#host-tab.prehidden
+      %a{ data: { toggle: 'tab' }, href: '#host', role: 'tab' } Host
 
   .tab-content.card-board
     #board.tab-pane.active
@@ -23,12 +25,27 @@
         #black-card
       #hand-content
     #users.tab-pane
+    #host.tab-pane
+      .container
+        .row
+          .col-md-2
+          .col-md-8
+            .panel.panel-default
+              .panel-heading
+                %h4 Host Tools
+              .panel-body
+                .btn.btn-danger#reset Reset Game
 
   %script#board-template{ type: 'text/x-handlebars-template' }
-    .prehidden{ id: '{{user}}-table' }
+    %span.prehidden{ id: '{{user}}-table' }
       .card.white.prehidden{ id: '{{user}}-card' }
         #card-text.prehidden
         .btn.btn-default.btn-sm.select-me{ data: { user: '{{user}}' } } This Card Wins!
+        .winner.text-center.prehidden{ id: '{{user}}-winner' }
+          %br/
+          %br/
+          %b Winner!
+        .user.prehidden{ id: '{{user}}-name'} {{user}}
       .card.place{ id: '{{user}}-placeholder' }
 
   %script#hand-template{ type: 'text/x-handlebars-template' }
@@ -37,7 +54,7 @@
       %div{ class: 'card white prehidden', id: '{{@key}}' }
         #card-text
           {{this}}
-        .btn.btn-default.btn-sm.use-me{ data: { card: '{{@key}}' } } Use This Card
+        .btn.btn-default.btn-sm.use-me Use This Card
       {{/each}}
 
   %script#users-template{ type: 'text/x-handlebars-template' }
