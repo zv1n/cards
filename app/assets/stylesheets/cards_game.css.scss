@@ -4,6 +4,47 @@ body {
   li.prehidden {
     display: none;
   }
+
+  .chat {
+    .chat-container {
+      max-height: 400px;
+      overflow: auto;
+      margin-bottom: 10px;
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      border-radius: 5px;
+      border: 1px solid black;
+
+      .chat-box {
+        height: 100%;
+        margin: -1px;
+
+        .user-message, .admin-message {
+          .user, .msg {
+            padding: 3px;
+          }
+
+          .msg {
+            color: black;
+            background-color: white;
+          }
+
+          .user {
+            width: 100px;
+            border: 1px solid black;
+            color: white;
+          }
+        }
+
+        .admin-message {
+          .msg {
+            border: 1px solid black;
+            background-color: lightgrey;
+          }
+        }
+      }
+    }
+  }
 }
 
 .content {

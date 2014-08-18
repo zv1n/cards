@@ -1,70 +1,90 @@
 :javascript
   window.firebase = "#{ENV['FIREBASE_ENDPOINT']}"
 
-#game-content
-  %ul.nav.nav-tabs{ role: 'tablist' }
-    %li.active
-      %a{ data: { toggle: 'tab' }, href: '#board', role: 'tab' } Game Table
-    %li
-      %a{ data: { toggle: 'tab' }, href: '#hand', role: 'tab' } My Hand
-    %li
-      %a{ data: { toggle: 'tab' }, href: '#users', role: 'tab' } Players
-    %li#host-tab.prehidden
-      %a{ data: { toggle: 'tab' }, href: '#host', role: 'tab' } Host
+.row
+  .col-md-7.col-xs-12
+    #game-content
+      %ul.nav.nav-tabs{ role: 'tablist' }
+        %li.active
+          %a{ data: { toggle: 'tab' }, href: '#board', role: 'tab' } Game Table
+        %li
+          %a{ data: { toggle: 'tab' }, href: '#hand', role: 'tab' } My Hand
+        %li
+          %a{ data: { toggle: 'tab' }, href: '#users', role: 'tab' } Players
+        %li#host-tab.prehidden
+          %a{ data: { toggle: 'tab' }, href: '#host', role: 'tab' } Host
 
-  .tab-content.card-board
-    #board.tab-pane.active
-      .card.black
-        #black-card-text
-        .user
-          %em#picker
-      #board-content
-    #hand.tab-pane
-      .you-are-picker.prehidden You are currently the picker.
-      .card.black.top
-        #black-card
-      #hand-content
-    #users.tab-pane
-    #host.tab-pane
-      .container
-        .row
-          .col-md-2
-          .col-md-8
-            .panel.panel-default
-              .panel-heading
-                %h4 Host Tools
-              .panel-body
-                .btn.btn-danger#reset Reset Game
+      .tab-content.card-board
+        #board.tab-pane.active
+          .card.black
+            #black-card-text
+            .user
+              %em#picker
+          #board-content
+        #hand.tab-pane
+          .you-are-picker.prehidden You are currently the picker.
+          .card.black.top
+            #black-card
+          #hand-content
+        #users.tab-pane
+        #host.tab-pane
+          .container
+            .row
+              .col-md-2
+              .col-md-8
+                .panel.panel-default
+                  .panel-heading
+                    %h4 Host Tools
+                  .panel-body
+                    .btn.btn-danger#reset Reset Game
 
-  %script#board-template{ type: 'text/x-handlebars-template' }
-    %span.prehidden{ id: '{{user}}-table' }
-      .card.white.prehidden{ id: '{{user}}-card' }
-        #card-text.prehidden
-        .btn.btn-default.btn-sm.select-me{ data: { user: '{{user}}' } } This Card Wins!
-        .winner.text-center.prehidden{ id: '{{user}}-winner' }
-          %br/
-          %br/
-          %b Winner!
-        .user.prehidden{ id: '{{user}}-name'} {{user}}
-      .card.place{ id: '{{user}}-placeholder' }
 
-  %script#hand-template{ type: 'text/x-handlebars-template' }
-    .hand
-      {{#each cards}}
-      %div{ class: 'card white prehidden', id: '{{@key}}' }
-        #card-text
-          {{this}}
-        .btn.btn-default.btn-sm.use-me Use This Card
-      {{/each}}
+  .col-md-5.col-xs-12.chat
+    .chat-container
+      %table.table.table-striped.chat-box#chat-box
+    .input-group
+      = text_field_tag :chat, nil, class: 'form-control'
+      .input-group-btn
+        .btn.btn-default Send
 
-  %script#users-template{ type: 'text/x-handlebars-template' }
-    .prehidden.card.player{ id: '{{user}}' }
-      {{user}}
-      .btn.btn-default.kick.prehidden{ data: { user: '{{user}}' } } x
-      .score
-        Points:
-        %span#points {{player.points}}
-      .score 
-        Order:
-        %span#order {{player.order}}
+%script#user-msg-template{ type: 'text/x-handlebars-template' }
+  %tr.user-message{ id: '{{id}}' }
+    %td.user {{name}}
+    %td.msg {{message}}
 
+%script#admin-msg-template{ type: 'text/x-handlebars-template' }
+  %tr.admin-message{ id: '{{id}}' }
+    %td.msg{ colspan: 2 }
+      %em {{message}}
+
+%script#board-template{ type: 'text/x-handlebars-template' }
+  %span.prehidden{ id: '{{user}}-table' }
+    .card.white.prehidden{ id: '{{user}}-card' }
+      #card-text.prehidden
+      .btn.btn-default.btn-sm.select-me{ data: { user: '{{user}}' } } This Card Wins!
+      .winner.text-center.prehidden{ id: '{{user}}-winner' }
+        %br/
+        %br/
+        %b Winner!
+      .user.prehidden{ id: '{{user}}-name'} {{user}}
+    .card.place{ id: '{{user}}-placeholder' }
+
+%script#hand-template{ type: 'text/x-handlebars-template' }
+  .hand
+    {{#each cards}}
+    %div{ class: 'card white prehidden', id: '{{@key}}' }
+      #card-text
+        {{this}}
+      .btn.btn-default.btn-sm.use-me Use This Card
+    {{/each}}
+
+%script#users-template{ type: 'text/x-handlebars-template' }
+  .prehidden.card.player{ id: '{{user}}' }
+    {{user}}
+    .btn.btn-default.kick.prehidden{ data: { user: '{{user}}' } } x
+    .score
+      Points:
+      %span#points {{player.points}}
+    .score 
+      Order:
+      %span#order {{player.order}}

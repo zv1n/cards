@@ -3,12 +3,14 @@ class window.CardsGame
     @root = new Firebase(window.firebase).child('current_games').child(@game_id)
     @fire = {
       root: @root,
+      chat: @root.child('chat'),
       cards: @root.child('cards'),
       user: @root.child('players').child(@user)
     }
 
     @black = new BlackDeck(@fire.cards)
     @white = new WhiteDeck(@fire.cards)
+    @chat = new Chat(@fire.chat, @user)
 
     @players = {}
     @game = {}
@@ -58,6 +60,7 @@ class window.CardsGame
 
     # Reset the local selection
     @selection = -1
+    @chat.game_line("#{user} wins the round!")
 
     @fire.root.update({ winner: user })
     game_update = {
@@ -90,6 +93,7 @@ class window.CardsGame
     _this = this
     setTimeout( ->
       _this.root.update(game_update)
+      _this.chat.game_line("Next up: #{next_picker}")
     , 5000)
 
 
