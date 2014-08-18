@@ -14,13 +14,14 @@
     .navbar.navbar-default.navbar-static-top
       .container
         = render 'layouts/navigation'
-    %main{:role => "main"}
+    %main.main{:role => "main"}
       .container
         .content
           .row
             .span12
               = render 'layouts/messages'
               = yield
-      / %footer
-      /  = render "footer"
+    %footer.footer
+      .container
+        = render "layouts/footer"
     = yield(:modal)

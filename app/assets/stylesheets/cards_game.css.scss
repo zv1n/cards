@@ -48,6 +48,39 @@ body {
   }
 }
 
+* {
+  margin: 0;
+}
+
+html, body {
+  height: 100%;
+
+  .main {
+    min-height: 95%;
+    /* equal to footer height */
+    margin-bottom: -142px; 
+  }
+
+  .main:after {
+    content: '';
+    display: block;
+  }
+
+  .footer, .main:after {
+    height: 142px;
+  }
+
+  .footer {
+    border-top: 1px solid darkgrey;
+    margin-top: 10px;
+    padding: 0;
+
+    .text-center {
+      margin-top: 15px;
+    }
+  }
+}
+
 .content {
   .content-panel {
     margin-top: 10px;
