@@ -60,6 +60,7 @@ class window.CardsGame
 
     # Reset the local selection
     @selection = -1
+
     @chat.game_line("#{user} wins the round!")
 
     @fire.root.update({ winner: user })

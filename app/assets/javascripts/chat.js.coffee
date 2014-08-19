@@ -1,4 +1,8 @@
 class window.Chat
+  @ALERT: 'alert'
+  @NOTICE: 'notice'
+  @CHAT: 'chat'
+
   constructor: (@fire, @user) ->
     _this = this
 
@@ -8,6 +12,7 @@ class window.Chat
     source = $("#admin-msg-template").html()
     @admin_message = Handlebars.compile(source) if source
 
+    @initialized = false
     @fire.on('value', (snapshot) ->
       _this.update_chat.call(_this, snapshot.val())
     )
@@ -27,6 +32,8 @@ class window.Chat
 
     @container = $('.chat-container')
 
+  notification_for: 
+
   update_chat: (@chat) ->
     last_id = undefined
     for f of @chat
@@ -37,6 +44,7 @@ class window.Chat
         if 'name' of msg
           $('#chat-box').append(@user_message(msg))
         else
+          @notification_for(msg) if @initialized
           $('#chat-box').append(@admin_message(msg))
 
         $('#chat-box .timeago').timeago()
@@ -49,9 +57,12 @@ class window.Chat
         scrollTop: chatline.position().top + chatline.height() + @container.scrollTop()
       }, 100)
 
+    @initialized = true
+
   send_chat: (line) ->
     if line.length > 0
       @fire.push({
+        type: @CHAT,
         name: @user,
         time: (new Date()).toISOString(),
         message: line
@@ -59,6 +70,17 @@ class window.Chat
 
   game_line: (line) ->
     @fire.push({
+      type: @NOTICE,
       time: (new Date()).toISOString(),
       message: line
     })
+
+  game_notification: (notify) ->
+    @fire.push({
+      time: (new Date()).toISOString(),
+      message: notify.message,
+      title: notify.title,
+      icon: notify.icon,
+      timeout: notify.timeout,
+      type: notify.type
+    })    
