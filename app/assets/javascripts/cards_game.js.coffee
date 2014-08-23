@@ -1,5 +1,7 @@
 class window.CardsGame
   constructor: (@user, @game_id) ->
+    @configure_version_updater()
+
     @root = new Firebase(window.firebase).child('current_games').child(@game_id)
     @fire = {
       root: @root,
@@ -15,6 +17,22 @@ class window.CardsGame
     @players = {}
     @game = {}
     @selection = -1
+
+  # Watch the game version.  If a new version is pushed to heroku, then we
+  # will push the game version in the firebase database.  This is effectively
+  # an auto-update feature.
+  configure_version_updater: ->
+    _this = this
+    new Firebase(window.firebase).child('version').on('value', (ss) ->
+      _this.update_version(ss.val())
+    )
+
+  update_version: (version) ->
+    new_version = (@version != undefined)
+    @version = version
+
+    console.log("Game version: #{@version}")
+    window.location.reload() if new_version
 
   start: () ->
     _this = this
@@ -42,7 +60,9 @@ class window.CardsGame
 
   all_players_picked: ->
     for f of @game.players
-      return false if @game.players[f].selection == -1
+      player = @game.players[f]
+      continue if player.seated != undefined && !player.seated
+      return false if player.selection == -1
 
     return true
 
@@ -107,6 +127,13 @@ class window.CardsGame
         @players[f] = new Player(f, this)
       @players[f].update(@game.players[f])
 
+    @remove_kicked_players()
+    @update_waiting_text()
+
+    if @game.picker
+      @black.remove_card(@game.players[@game.picker].selection)
+
+  remove_kicked_players: ->
     removals = []
     for p of @players
       unless p of @game.players
@@ -119,8 +146,16 @@ class window.CardsGame
         alert('You have been kicked from this game!')
         Turbolinks.visit('/')
 
-    if @game.picker
-      @black.remove_card(@game.players[@game.picker].selection)
+  update_waiting_text: ->
+    waiting = []
+    for f of @players
+      if @players[f].is_seated()
+        waiting.push f unless @players[f].has_selected()
+
+    if waiting.length > 0
+      $('#waiting').slideDown().text("Waiting on: #{waiting.join(', ')}")
+    else
+      $('#waiting').slideUp()
 
   update_cards: ->
     unless @game.cards
@@ -223,7 +258,8 @@ class window.CardsGame
         player_info = {
           hand: {},
           won: {},
-          selection: -1, 
+          selection: -1,
+          seated: true,
           order: Object.keys(list.players).length
         }
 

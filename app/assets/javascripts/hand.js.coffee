@@ -18,13 +18,7 @@ class window.Hand
         $('#black-card').html(_this.black_card).fadeIn()
       )
 
-      if @picker
-        $('.you-are-picker').slideDown()
-        $('.hand .card').addClass('disabled')
-      else
-        $('.you-are-picker').slideUp()
-        if @player.selection == -1
-          $('.hand .card').removeClass('disabled')
+    @configure_disable_hand()
 
   configure_card_sel: ->
     $('.hand .card').click (event) ->
@@ -43,6 +37,17 @@ class window.Hand
         $target.addClass('selected')
     else
       $('#board-content .card.white').unbind('click')
+
+  configure_disable_hand: ->
+    if @picker
+      $('.you-are-picker').slideDown()
+      $('.hand .card').addClass('disabled')
+    else
+      $('.you-are-picker').slideUp()
+      if @player.selection == -1
+        $('.hand .card').removeClass('disabled')
+      else
+        $('.hand .card').addClass('disabled')
 
   hand: ->
     @player.hand
@@ -128,22 +133,38 @@ class window.Hand
       $cards.addClass('disabled') if @player.selection > -1 || @picker
       $cards.slideDown().removeClass('prehidden')
 
+      # Handle 'Use This Card' for picking your white card
       $('.use-me').unbind('click').click (event) ->
         $target = $(event.currentTarget)
+        
+        #Disable the card
         $target.attr('disabled', true).addClass('disabled')
+
+        # Find the card key (element id)
         card = $target.parent().attr('id')
 
         $('#hand-content .card').addClass('disabled')
 
+        # Switch out card test: fadeOut, Update, fadeIn
         $("##{card} #card-text").fadeOut(->
           $("##{card}").removeClass('selected')
-          $target.attr('disabled', false).removeClass('disabled')
 
-          _this.fire.user.update({ selection: parseInt(card) })
-          _this.fire.user.child('hand').child(card).remove()
+          # Undisable the Use-Me button.
+          $target.attr('disabled', false).removeClass('disabled')
+          cardupdate = _this.player.hand
+
+          draw = _this.white.draw()
+          cardupdate[card] = null
+          cardupdate[draw.key] = draw.card
+
+          # Send selection and card updates as 1 single update
+          _this.fire.user.update
+            selection: parseInt(card)
+            hand: cardupdate
         )
 
     @configure_card_sel()
+    @configure_disable_hand()
 
 
 

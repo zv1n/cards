@@ -79,7 +79,7 @@ class window.Player
     @show_card_text(@game.all_players_picked(), $card)
 
     setTimeout( ->
-      _this.show_table_cards(!_this.game.is_picker(_this.player))
+      _this.show_table_cards(_this.should_display_cards())
     ,
       500)
     return
@@ -107,6 +107,15 @@ class window.Player
     else
       placeholder.fadeOut ->
         card.removeClass('no-select').fadeIn()
+
+  should_display_cards: ->
+    return (!@game.is_picker(@player)) && (@is_seated() || @has_selected())
+
+  is_seated: ->
+    return (@self.seated == undefined || @self.seated)
+
+  has_selected: ->
+    @self.selection != -1
 
   show_table_cards: (show) ->
     if show
