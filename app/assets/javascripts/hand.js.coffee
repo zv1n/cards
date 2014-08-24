@@ -44,10 +44,13 @@ class window.Hand
       $('.hand .card').addClass('disabled')
     else
       $('.you-are-picker').slideUp()
-      if @player.selection > -1 || !@player.seated
+      if @player.selection > -1 || !@is_seated()
         $('.hand .card').addClass('disabled')
       else
         $('.hand .card').removeClass('disabled')
+
+  is_seated: ->
+    @player.seated == undefined || @player.seated
 
   hand: ->
     @player.hand
