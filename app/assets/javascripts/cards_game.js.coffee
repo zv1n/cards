@@ -65,9 +65,11 @@ class window.CardsGame
   play_order: (name) ->
     @game.players[name].order
 
-  all_players_picked: ->
-    for f of @game.players
-      player = @game.players[f]
+  all_players_picked: (players)->
+    players ||= @game.players
+
+    for f of players
+      player = players[f]
       continue if player.seated != undefined && !player.seated
       return false if player.selection == -1
 
@@ -136,11 +138,16 @@ class window.CardsGame
     , 5000)
 
 
-  update_players: ->
+  update_players: (players)->
+    shuffle = @all_players_picked(players) && !@all_players_picked()
+
+    @game.players = players
     for f of @game.players
       unless @players[f]
         @players[f] = new Player(f, this)
       @players[f].update(@game.players[f])
+
+    @shuffle_board() if shuffle
 
     @remove_kicked_players()
     @update_waiting_text()
@@ -337,7 +344,7 @@ class window.CardsGame
       Turbolinks.visit('/')
 
     @update_cards()
-    @update_players()
+    @update_players(@game.players)
     @update_picker()
     @update_round()
 
@@ -346,9 +353,8 @@ class window.CardsGame
       _this.update_cards.call(_this)
     )
 
-    @fire.root.child('players').on('value', (snapshot) ->
-      _this.game.players = snapshot.val()
-      _this.update_players.call(_this)
+    @fire.root.child('players').on('value', (snapshot) ->    
+      _this.update_players.call(_this, snapshot.val())
     )
 
     @fire.user.on('value', (snapshot) ->
@@ -356,12 +362,7 @@ class window.CardsGame
     )
 
     @fire.root.on('value', (snapshot) ->
-      # Shuffle the board if this is a next-round transition.
-      game = snapshot.val()
-      if game.winner == undefined && _this.game.winner != undefined
-        _this.shuffle_board()
-
-      _this.game = game
+      _this.game = snapshot.val()
       _this.update_round.call(_this)
     )
 
