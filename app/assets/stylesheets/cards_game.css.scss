@@ -91,6 +91,14 @@ html, body {
   }
 }
 
+#sitstand {
+  margin-bottom: 10px;
+
+  &.prehidden {
+    display: none;
+  }
+}
+
 .content {
   .content-panel {
     margin-top: 10px;
@@ -202,7 +210,7 @@ html, body {
       background-color: #EEE;
 
       width: 200px;
-      height: 70px;
+      height: 100px;
 
       &.picker {
         background-color: black;

@@ -3,6 +3,7 @@
 
 .row
   .col-md-7.col-xs-12
+    .btn.btn-block.prehidden#sitstand
     #game-content
       %ul.nav.nav-tabs{ role: 'tablist' }
         %li.active
@@ -16,7 +17,7 @@
 
       .tab-content.card-board
         #board.tab-pane.active
-          .waiting#waiting
+          .waiting.prehidden#waiting
           .card.black
             #black-card-text
             .user
@@ -60,7 +61,7 @@
       %em {{message}}
 
 %script#board-template{ type: 'text/x-handlebars-template' }
-  %span.prehidden{ id: '{{user}}-table' }
+  %span.user-table.prehidden{ id: '{{user}}-table' }
     .card.white.prehidden{ id: '{{user}}-card' }
       #card-text.prehidden
       .btn.btn-default.btn-sm.select-me{ data: { user: '{{user}}' } } This Card Wins!
@@ -90,3 +91,5 @@
     .score 
       Order:
       %span#order {{player.order}}
+    .score
+      %span#seated

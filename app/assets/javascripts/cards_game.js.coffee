@@ -32,7 +32,14 @@ class window.CardsGame
     @version = version
 
     console.log("Game version: #{@version}")
-    window.location.reload() if new_version
+    if new_version
+      if @game.winner != undefined
+        window.location.reload()
+      else
+        setTimeout(
+          ->
+            window.location.reload()
+          , 5000)
 
   start: () ->
     _this = this
@@ -66,12 +73,20 @@ class window.CardsGame
 
     return true
 
-  next_picker: ->
-    picker_idx = @game.players[@game.picker].order + 1
+  next_picker: (picker_idx) ->
+    picker_idx ||= @game.players[@game.picker].order + 1
     picker_idx = 0 if picker_idx == Object.keys(@game.players).length
 
-    for f of @game.players
-      return f if @game.players[f].order == picker_idx
+    players = 0
+    for f of @players
+      players++ if @players[f].is_seated()
+
+    return @game.picker unless players > 1
+
+    for f of @players
+      if @players[f].order() == picker_idx
+        return f if @players[f].is_seated()
+        return @next_picker(picker_idx + 1)
 
     return Object.keys(@game.players)[0]
 
@@ -129,6 +144,7 @@ class window.CardsGame
 
     @remove_kicked_players()
     @update_waiting_text()
+    @update_sit_stand()
 
     if @game.picker
       @black.remove_card(@game.players[@game.picker].selection)
@@ -156,6 +172,27 @@ class window.CardsGame
       $('#waiting').slideDown().text("Waiting on: #{waiting.join(', ')}")
     else
       $('#waiting').slideUp()
+
+  toggle_seat: ->
+    @fire.user.child('seated').set(!@players[@user].is_seated())
+
+  update_sit_stand: ->
+    $sitstand_btn = $('#sitstand')
+
+    _this = this
+    $sitstand_btn.unbind('click').click (event) ->
+      _this.toggle_seat()
+
+    if @players[@user].is_seated()
+      if $sitstand_btn.hasClass('btn-danger') || !$sitstand_btn.is(':visible')
+        $sitstand_btn.removeClass('btn-danger').addClass('btn-primary')
+        $sitstand_btn.text('Stand Up')
+        $sitstand_btn.slideDown()
+    else
+      if $sitstand_btn.hasClass('btn-primary') || !$sitstand_btn.is(':visible')
+        $sitstand_btn.removeClass('btn-primary').addClass('btn-danger')
+        $sitstand_btn.text('Sit Down')
+        $sitstand_btn.slideDown()
 
   update_cards: ->
     unless @game.cards
@@ -191,6 +228,13 @@ class window.CardsGame
 
   displaying_winner: ->
     @game.winner != undefined
+
+  shuffle_board: ->
+    cards = $('.user-table')
+    for card in cards
+      target = Math.floor(Math.random() * cards.length - 1) + 1
+      target2 = Math.floor(Math.random() * cards.length - 1) + 1
+      cards.eq(target).before(cards.eq(target2))
 
   update_round: ->
     return @game_over() if @game.game_over
@@ -312,7 +356,12 @@ class window.CardsGame
     )
 
     @fire.root.on('value', (snapshot) ->
-      _this.game = snapshot.val()
+      # Shuffle the board if this is a next-round transition.
+      game = snapshot.val()
+      if game.winner == undefined && _this.game.winner != undefined
+        _this.shuffle_board()
+
+      _this.game = game
       _this.update_round.call(_this)
     )
 

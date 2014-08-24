@@ -36,7 +36,11 @@ class window.Player
       user.find('.kick').removeClass('prehidden')
 
     user.find('#points').text(@points_for_player(@self))
-    user.find('#order').text(@game.play_order(@player))
+    user.find('#order').text(@self.order)
+    if @is_seated()
+      user.find('#seated').text('Sitting')
+    else
+      user.find('#seated').text('Standing') 
 
     if @game.is_picker(@player)
       user.addClass('picker')
@@ -84,6 +88,9 @@ class window.Player
       500)
     return
 
+  order: ->
+    @self.order
+
   update_winner: (winner) ->
     if @player == winner
       $("##{@player}-winner").fadeIn()
@@ -119,7 +126,7 @@ class window.Player
 
   show_table_cards: (show) ->
     if show
-      $("##{@player}-table").fadeIn()
+      $("##{@player}-table").slideDown()
     else
       $("##{@player}-table").fadeOut()
 
